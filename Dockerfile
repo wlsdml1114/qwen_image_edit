@@ -37,7 +37,8 @@ RUN ln -s /usr/bin/python3.10 /usr/bin/python && \
     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python get-pip.py
 
-RUN pip install -U wheel setuptools packaging
+RUN pip install -U wheel setuptools packaging 
+RUN pip install -U "huggingface_hub[hf_transfer]"
 RUN pip install runpod websocket-client
 
 RUN pip install torch==2.7.0+cu128 torchvision torchaudio xformers triton --index-url https://download.pytorch.org/whl/cu128
