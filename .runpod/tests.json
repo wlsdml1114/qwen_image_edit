@@ -3,7 +3,7 @@
       {
         "name": "test_case_name",
         "input": {
-          "image_path": "/example_image.jpg",
+          "image_path": "/example_image.png",
           "prompt": "A majestic cat sitting on a throne, cinematic lighting",
           "seed": 12345,
           "guidance": 2.5,
