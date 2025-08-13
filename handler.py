@@ -108,7 +108,11 @@ def handler(job):
     image_input = job_input["image_path"]
     # 헬퍼 함수를 사용해 이미지 파일 경로 확보 (Base64 또는 Path)
     # 이미지 확장자를 알 수 없으므로 .jpg로 가정하거나, 입력에서 받아야 합니다.
-    image_path = save_data_if_base64(image_input, task_id, "input_image.jpg")
+    if image_input == "/example_image.png":
+        image_path = "/example_image.png"
+    else:
+        image_path = save_data_if_base64(image_input, task_id, "input_image.jpg")
+    
 
     prompt = load_workflow("/flux_kontext_example.json")
 
