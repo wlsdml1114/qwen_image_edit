@@ -69,5 +69,6 @@ RUN wget -q https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve
 
 
 COPY . .
+RUN chmod +x /start.sh
 
-CMD python /ComfyUI/main.py --listen --use-sage-attention & python handler.py
+CMD ["/start.sh"]
