@@ -136,7 +136,7 @@ def handler(job):
     logger.info(f"Checking HTTP connection to: {http_url}")
     
     # HTTP 연결 확인 (최대 1분)
-    max_http_attempts = 60
+    max_http_attempts = 180
     for http_attempt in range(max_http_attempts):
         try:
             import urllib.request
