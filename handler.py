@@ -29,6 +29,9 @@ def save_data_if_base64(data_input, temp_dir, output_filename):
         # Base64 문자열은 디코딩을 시도하면 성공합니다.
         decoded_data = base64.b64decode(data_input)
         
+        # 디렉토리가 존재하지 않으면 생성
+        os.makedirs(temp_dir, exist_ok=True)
+        
         # 디코딩에 성공하면, 임시 파일로 저장합니다.
         file_path = os.path.abspath(os.path.join(temp_dir, output_filename))
         with open(file_path, 'wb') as f: # 바이너리 쓰기 모드('wb')로 저장
