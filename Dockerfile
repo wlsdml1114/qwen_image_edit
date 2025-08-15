@@ -69,6 +69,6 @@ RUN wget -q https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged/resolve
 
 
 COPY . .
-RUN chmod +x /start.sh
+RUN chmod +x /entrypoint.sh
 
-CMD ["/start.sh"]
+CMD ["/entrypoint.sh"]
