@@ -9,9 +9,38 @@ import logging
 import urllib.request
 import urllib.parse
 import binascii # Base64 에러 처리를 위해 import
+
+
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# CUDA 검사 및 설정
+def check_cuda_availability():
+    """CUDA 사용 가능 여부를 확인하고 환경 변수를 설정합니다."""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            logger.info("✅ CUDA is available and working")
+            os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+            return True
+        else:
+            logger.error("❌ CUDA is not available")
+            raise RuntimeError("CUDA is required but not available")
+    except Exception as e:
+        logger.error(f"❌ CUDA check failed: {e}")
+        raise RuntimeError(f"CUDA initialization failed: {e}")
+
+# CUDA 검사 실행
+try:
+    cuda_available = check_cuda_availability()
+    if not cuda_available:
+        raise RuntimeError("CUDA is not available")
+except Exception as e:
+    logger.error(f"Fatal error: {e}")
+    logger.error("Exiting due to CUDA requirements not met")
+    exit(1)
+
 
 
 server_address = os.getenv('SERVER_ADDRESS', '127.0.0.1')

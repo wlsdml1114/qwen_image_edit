@@ -14,6 +14,9 @@ ENV PATH="/usr/local/cuda/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
 ENV HF_HUB_ENABLE_HF_TRANSFER=1
 ENV HF_HUB_DISABLE_PROGRESS_BARS=1
+# CUDA 환경 변수 - CPU fallback 없음
+ENV FORCE_CUDA=1
+ENV CUDA_VISIBLE_DEVICES=0
 
 # Set working directory
 WORKDIR /
