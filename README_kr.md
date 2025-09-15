@@ -3,9 +3,23 @@
 
 이 프로젝트는 [Flux Kontext](https://github.com/Comfy-Org/Flux_Kontext)를 RunPod Serverless 환경에서 쉽게 배포하고 사용할 수 있도록 설계된 템플릿입니다.
 
-[![Runpod](https://api.runpod.io/badge/wlsdml1114/flux_kontext_Runpod_hub)](https://console.runpod.io/hub/wlsdml1114/flux_kontext_Runpod_hub)
+[![Runpod](https://console.runpod.io/hub/wlsdml1114/Flux-tontext_Runpod_hub)](https://console.runpod.io/hub/wlsdml1114/Flux-tontext_Runpod_hub)
 
 Flux Kontext는 Flux 아키텍처를 사용하여 맥락적 이해와 창의적인 텍스트-투-이미지 기능을 가진 고품질 이미지를 생성하는 고급 AI 모델입니다.
+
+## 🎨 Engui Studio 통합
+
+[![EnguiStudio](https://raw.githubusercontent.com/wlsdml1114/Engui_Studio/main/assets/banner.png)](https://github.com/wlsdml1114/Engui_Studio)
+
+이 InfiniteTalk 템플릿은 포괄적인 AI 모델 관리 플랫폼인 **Engui Studio**를 위해 주로 설계되었습니다. API를 통해 사용할 수 있지만, Engui Studio는 향상된 기능과 더 넓은 모델 지원을 제공합니다.
+
+**Engui Studio의 장점:**
+- **확장된 모델 지원**: API를 통해 사용 가능한 것보다 더 다양한 AI 모델에 접근
+- **향상된 사용자 인터페이스**: 직관적인 워크플로우 관리 및 모델 선택
+- **고급 기능**: AI 모델 배포를 위한 추가 도구 및 기능
+- **원활한 통합**: Engui Studio 생태계에 최적화
+
+> **참고**: 이 템플릿은 API 호출로도 완벽하게 작동하지만, Engui Studio 사용자는 향후 출시 예정인 추가 모델과 기능에 접근할 수 있습니다.
 
 ## ✨ 주요 기능
 
