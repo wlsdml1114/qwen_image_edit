@@ -3,7 +3,7 @@
 
 This project is a template designed to easily deploy and use [Flux Kontext](https://github.com/Comfy-Org/Flux_Kontext) in the RunPod Serverless environment.
 
-[![Runpod](https://console.runpod.io/hub/wlsdml1114/Flux-tontext_Runpod_hub)](https://console.runpod.io/hub/wlsdml1114/Flux-tontext_Runpod_hub)
+[![Runpod](https://api.runpod.io/badge/wlsdml1114/Flux-tontext_Runpod_hub)](https://console.runpod.io/hub/wlsdml1114/Flux-tontext_Runpod_hub)
 
 Flux Kontext is an advanced AI model that generates high-quality images with contextual understanding and creative text-to-image capabilities using the Flux architecture.
 
