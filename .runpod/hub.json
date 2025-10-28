@@ -1,6 +1,6 @@
 {
-    "title": "Flux_kontext_Runpod_hub",
-    "description": "FLUX.1 Kontext is a suite of generative flow matching models that allow you to generate and edit images.",
+    "title": "Qwen_image_edit",
+    "description": "Qwen_image_edit is a model that allows you to edit images using Qwen.",
     "type": "serverless",
     "category": "image",
     "iconUrl": "https://github.com/wlsdml1114/Engui_Studio/blob/main/assets/logo.png?raw=true",

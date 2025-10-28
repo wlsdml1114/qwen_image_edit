@@ -9,6 +9,8 @@ import logging
 import urllib.request
 import urllib.parse
 import binascii # Base64 에러 처리를 위해 import
+import subprocess
+import time
 
 
 # 로깅 설정
@@ -131,31 +133,105 @@ def load_workflow(workflow_path):
     with open(workflow_path, 'r') as file:
         return json.load(file)
 
+# ------------------------------
+# 입력 처리 유틸 (path/url/base64)
+# ------------------------------
+def process_input(input_data, temp_dir, output_filename, input_type):
+    """입력 데이터를 처리하여 파일 경로를 반환하는 함수
+    - input_type: "path" | "url" | "base64"
+    """
+    if input_type == "path":
+        logger.info(f"📁 경로 입력 처리: {input_data}")
+        return input_data
+    elif input_type == "url":
+        logger.info(f"🌐 URL 입력 처리: {input_data}")
+        os.makedirs(temp_dir, exist_ok=True)
+        file_path = os.path.abspath(os.path.join(temp_dir, output_filename))
+        return download_file_from_url(input_data, file_path)
+    elif input_type == "base64":
+        logger.info("🔢 Base64 입력 처리")
+        return save_base64_to_file(input_data, temp_dir, output_filename)
+    else:
+        raise Exception(f"지원하지 않는 입력 타입: {input_type}")
+
+def download_file_from_url(url, output_path):
+    """URL에서 파일을 다운로드하는 함수"""
+    try:
+        result = subprocess.run([
+            'wget', '-O', output_path, '--no-verbose', url
+        ], capture_output=True, text=True)
+        if result.returncode == 0:
+            logger.info(f"✅ URL에서 파일을 성공적으로 다운로드했습니다: {url} -> {output_path}")
+            return output_path
+        else:
+            logger.error(f"❌ wget 다운로드 실패: {result.stderr}")
+            raise Exception(f"URL 다운로드 실패: {result.stderr}")
+    except subprocess.TimeoutExpired:
+        logger.error("❌ 다운로드 시간 초과")
+        raise Exception("다운로드 시간 초과")
+    except Exception as e:
+        logger.error(f"❌ 다운로드 중 오류 발생: {e}")
+        raise Exception(f"다운로드 중 오류 발생: {e}")
+
+def save_base64_to_file(base64_data, temp_dir, output_filename):
+    """Base64 데이터를 파일로 저장하는 함수"""
+    try:
+        decoded_data = base64.b64decode(base64_data)
+        os.makedirs(temp_dir, exist_ok=True)
+        file_path = os.path.abspath(os.path.join(temp_dir, output_filename))
+        with open(file_path, 'wb') as f:
+            f.write(decoded_data)
+        logger.info(f"✅ Base64 입력을 '{file_path}' 파일로 저장했습니다.")
+        return file_path
+    except (binascii.Error, ValueError) as e:
+        logger.error(f"❌ Base64 디코딩 실패: {e}")
+        raise Exception(f"Base64 디코딩 실패: {e}")
+
 def handler(job):
     job_input = job.get("input", {})
 
     logger.info(f"Received job input: {job_input}")
     task_id = f"task_{uuid.uuid4()}"
 
-    image_input = job_input["image_path"]
-    # 헬퍼 함수를 사용해 이미지 파일 경로 확보 (Base64 또는 Path)
-    # 이미지 확장자를 알 수 없으므로 .jpg로 가정하거나, 입력에서 받아야 합니다.
-    if image_input == "/example_image.png":
-        image_path = "/example_image.png"
+    # ------------------------------
+    # 이미지 입력 수집 (1개 또는 2개)
+    # 지원 키: image_path | image_url | image_base64
+    #         image_path_2 | image_url_2 | image_base64_2
+    # ------------------------------
+    image1_path = None
+    image2_path = None
+
+    if "image_path" in job_input:
+        image1_path = process_input(job_input["image_path"], task_id, "input_image_1.jpg", "path")
+    elif "image_url" in job_input:
+        image1_path = process_input(job_input["image_url"], task_id, "input_image_1.jpg", "url")
+    elif "image_base64" in job_input:
+        image1_path = process_input(job_input["image_base64"], task_id, "input_image_1.jpg", "base64")
+
+    if "image_path_2" in job_input:
+        image2_path = process_input(job_input["image_path_2"], task_id, "input_image_2.jpg", "path")
+    elif "image_url_2" in job_input:
+        image2_path = process_input(job_input["image_url_2"], task_id, "input_image_2.jpg", "url")
+    elif "image_base64_2" in job_input:
+        image2_path = process_input(job_input["image_base64_2"], task_id, "input_image_2.jpg", "base64")
+
+    if image2_path:
+        workflow_path = "/qwen_image_edit_2.json"
     else:
-        image_path = save_data_if_base64(image_input, task_id, "input_image.jpg")
-    
+        workflow_path = "/qwen_image_edit_1.json"
 
-    prompt = load_workflow("/flux_kontext_example.json")
+    prompt = load_workflow(workflow_path)
 
-    prompt["41"]["inputs"]["image"] = image_path
-    prompt["6"]["inputs"]["text"] = job_input["prompt"]
-    prompt["25"]["inputs"]["noise_seed"] = job_input["seed"]
-    prompt["26"]["inputs"]["guidance"] = job_input["guidance"]
-    prompt["27"]["inputs"]["width"] = job_input["width"]
-    prompt["27"]["inputs"]["height"] = job_input["height"]
-    prompt["30"]["inputs"]["width"] = job_input["width"]
-    prompt["30"]["inputs"]["height"] = job_input["height"]
+    prompt["78"]["inputs"]["image"] = image1_path
+    if image2_path:
+        prompt["123"]["inputs"]["image"] = image2_path
+
+    prompt["111"]["inputs"]["prompt"] = job_input["prompt"]
+
+
+    prompt["3"]["inputs"]["seed"] = job_input["seed"]
+    prompt["128"]["inputs"]["value"] = job_input["width"]
+    prompt["129"]["inputs"]["value"] = job_input["height"]
 
     ws_url = f"ws://{server_address}:8188/ws?clientId={client_id}"
     logger.info(f"Connecting to WebSocket: {ws_url}")
@@ -182,7 +258,6 @@ def handler(job):
     # 웹소켓 연결 시도 (최대 3분)
     max_attempts = int(180/5)  # 3분 (1초에 한 번씩 시도)
     for attempt in range(max_attempts):
-        import time
         try:
             ws.connect(ws_url)
             logger.info(f"웹소켓 연결 성공 (시도 {attempt+1})")
