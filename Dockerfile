@@ -19,6 +19,10 @@ RUN cd /ComfyUI/custom_nodes/ && \
     cd ComfyUI-Manager && \
     pip install --no-cache-dir -r requirements.txt
 
+RUN cd /ComfyUI/custom_nodes/ && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes && \
+    cd ComfyUI-KJNodes && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Download models
 RUN wget -q https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_edit_2509_fp8_e4m3fn.safetensors -O /ComfyUI/models/diffusion_models/qwen_image_edit_2509_fp8_e4m3fn.safetensors
