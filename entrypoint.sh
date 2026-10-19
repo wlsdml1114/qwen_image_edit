@@ -2,6 +2,13 @@
 
 # Exit immediately if a command exits with a non-zero status.
 set -e
+BOOT_START_EPOCH=$(date +%s)
+log_elapsed() {
+    local label="$1"
+    local now
+    now=$(date +%s)
+    echo "QWEN_TIMING stage=${label} elapsed_seconds=$((now - BOOT_START_EPOCH))"
+}
 
 # CUDA 검사 및 설정
 echo "Checking CUDA availability..."
@@ -42,6 +49,7 @@ case $? in
         exit 1
         ;;
 esac
+log_elapsed cuda_check_complete
 
 # 추가적인 nvidia-smi 검사
 if command -v nvidia-smi &> /dev/null; then
@@ -83,8 +91,10 @@ if [ $wait_count -ge $max_wait ]; then
     echo "Error: ComfyUI failed to start within $max_wait seconds"
     exit 1
 fi
+log_elapsed comfyui_ready
 
 # Start the handler in the foreground
 # 이 스크립트가 컨테이너의 메인 프로세스가 됩니다.
 echo "Starting the handler..."
+log_elapsed handler_start
 exec python handler.py

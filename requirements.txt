@@ -1,0 +1,5 @@
+runpod>=1.7.13,<2
+websocket-client>=1.8,<2
+requests>=2.32,<3
+Pillow>=10.4,<12
+librosa>=0.10,<1

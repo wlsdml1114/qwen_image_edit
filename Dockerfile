@@ -5,7 +5,8 @@ FROM wlsdml1114/multitalk-base:1.7 as runtime
 RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
 RUN pip install -U "huggingface_hub[hf_transfer]"
-RUN pip install runpod websocket-client librosa
+COPY requirements.txt /tmp/qwen-worker-requirements.txt
+RUN pip install --no-cache-dir -r /tmp/qwen-worker-requirements.txt
 
 # Set working directory
 WORKDIR /

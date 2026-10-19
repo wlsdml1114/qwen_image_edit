@@ -1,0 +1,11 @@
+.git
+.github
+__pycache__
+*.py[cod]
+.env
+.env.*
+!.env.example
+out_test*.png
+test_api.py
+README*.md
+examples/output

@@ -1,0 +1,37 @@
+# Build this infrequently, only when Qwen/ComfyUI/model dependencies change.
+# Publish the resulting image to a registry and pin its immutable digest in
+# Dockerfile.app's QWEN_RUNTIME_IMAGE build argument.
+FROM wlsdml1114/multitalk-base:1.7
+
+RUN apt-get update && apt-get install -y --no-install-recommends wget git curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install -U "huggingface_hub[hf_transfer]"
+COPY requirements.txt /tmp/qwen-worker-requirements.txt
+RUN pip install --no-cache-dir -r /tmp/qwen-worker-requirements.txt
+
+WORKDIR /
+RUN git clone https://github.com/comfyanonymous/ComfyUI.git /ComfyUI \
+    && pip install --no-cache-dir -r /ComfyUI/requirements.txt
+
+RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git /ComfyUI/custom_nodes/ComfyUI-Manager \
+    && pip install --no-cache-dir -r /ComfyUI/custom_nodes/ComfyUI-Manager/requirements.txt
+
+RUN git clone https://github.com/kijai/ComfyUI-KJNodes.git /ComfyUI/custom_nodes/ComfyUI-KJNodes \
+    && pip install --no-cache-dir -r /ComfyUI/custom_nodes/ComfyUI-KJNodes/requirements.txt
+
+RUN mkdir -p /ComfyUI/models/diffusion_models /ComfyUI/models/loras \
+    /ComfyUI/models/text_encoders /ComfyUI/models/vae \
+    && wget -q https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors \
+       -O /ComfyUI/models/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors \
+    && wget -q https://huggingface.co/lightx2v/Qwen-Image-Edit-2511-Lightning/resolve/main/Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors \
+       -O /ComfyUI/models/loras/Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors \
+    && wget -q https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors \
+       -O /ComfyUI/models/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors \
+    && wget -q https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors \
+       -O /ComfyUI/models/vae/qwen_image_vae.safetensors
+
+# Keep runtime image independent of handler/workflow/Pillow-overlay source edits.
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]

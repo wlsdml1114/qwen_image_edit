@@ -51,10 +51,15 @@ The `input` object must contain the following fields. Image inputs support **URL
 | `seed` | `integer` | **Yes** | `N/A` | Random seed for deterministic output. |
 | `width` | `integer` | **Yes** | `N/A` | Output image width in pixels. |
 | `height` | `integer` | **Yes** | `N/A` | Output image height in pixels. |
+| `negative_prompt` | `string` | No | anatomy/text artifact guard | Negative conditioning sent to Qwen workflow node `110`. |
+| `text_overlay` | `object` | No | `N/A` | Exact post-generation Pillow text: `text`, optional `position` (`bottom`/`center`), `font` (`sans`, `sans-bold`, `serif`, `mono`), `font_size`, and hex `color`. |
 
 Notes:
-- Guidance is not used by the current handler.
+- The worker uses Qwen Image Edit 2511's own positive and negative conditioning nodes. The bundled four-step Lightning workflow uses CFG 1, which can make negative conditioning weak; it does not guarantee correct anatomy.
+- If `OPENAI_API_KEY` is configured as a RunPod endpoint secret, the handler optionally improves prompt composition using `PROMPT_ENHANCER_MODEL` (defaults to `gpt-4o-mini`). Without the key, it uses the original prompt and does not block image generation. This calls a separately billed OpenAI API when enabled by configuring the key.
+- Pillow overlay text is provided separately from the visual prompt and composited after generation. The text string is not passed to the image model as copy to render.
 - The workflow is selected automatically by the number of images provided (1, 2, or 3).
+- FLUX-only XLabs ControlNet/IP-Adapter nodes and Impact Pack FaceDetailer are intentionally not included: the current worker loads Qwen 2511 and does not install those nodes or models. Mixing incompatible model-family nodes would break the endpoint.
 
 **Request Example (single image via URL):**
 
@@ -91,10 +96,18 @@ Notes:
 {
   "input": {
     "prompt": "vintage look, grain, warm tones",
+    "negative_prompt": "extra fingers, fused fingers, deformed hands, unwanted text, watermark",
     "image_base64": "<BASE64_STRING>",
     "seed": 42,
     "width": 512,
-    "height": 512
+    "height": 512,
+    "text_overlay": {
+      "text": "Best Coffee in Town",
+      "position": "bottom",
+      "font": "sans-bold",
+      "font_size": 36,
+      "color": "#FFFFFF"
+    }
   }
 }
 ```
